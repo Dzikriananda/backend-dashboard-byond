@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -43,15 +44,19 @@ public class AuthController {
     @PostMapping(value = "/login", consumes = "application/json", produces = "application/json")
     public ResponseEntity login(@RequestBody @Validated LoginDto userData) {
         HttpHeaders headers = new HttpHeaders();
+        Map<String, String> resMessage = new HashMap<>();
+
 
         if (userData.getUsername() == null && userData.getEmail() == null) {
-            return new ResponseEntity<>("Username or Email must be not empty", headers, HttpStatus.BAD_REQUEST);
+            resMessage.put("message", "Email Must be not empty");
+            return new ResponseEntity<>(resMessage, headers, HttpStatus.BAD_REQUEST);
         }
 
         User userFromDb = authService.findUserByEmail(userData.getEmail());
 
         if (userFromDb == null) {
-            return new ResponseEntity<>("Email or password invalid", headers, HttpStatus.NOT_FOUND);
+            resMessage.put("message", "Email or password invalid");
+            return new ResponseEntity<>(resMessage, headers, HttpStatus.NOT_FOUND);
         }
 
         if (!authService.matchPassword(userData.getPassword(), userFromDb.getPassword())) {

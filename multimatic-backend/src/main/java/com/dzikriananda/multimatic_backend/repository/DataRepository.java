@@ -26,9 +26,15 @@ public interface DataRepository extends JpaRepository<ByondReview, Integer> {
             "ORDER BY\n" +
             "    review_date; ", nativeQuery = true)
     List<Object[]> findAllSentiment();
-    @Query(value = "SELECT \"appVersion\" ,sentiment, COUNT(*) AS count\n" +
+    @Query(value = "SELECT app_version ,sentiment, COUNT(*) AS count\n" +
             "\tFROM byond_review\n" +
-            "\tGROUP BY sentiment,\"appVersion\"",nativeQuery = true)
+            "\tGROUP BY sentiment,\"app_version\"",nativeQuery = true)
     List<Object[]> findDistributionSentiment();
+
+    @Query(value = "SELECT score, COUNT(*) AS frequency\n" +
+            "FROM byond_review br \n" +
+            "GROUP BY score\n" +
+            "ORDER BY score",nativeQuery = true)
+    List<Object[]> findScoreFrequency();
 
 }

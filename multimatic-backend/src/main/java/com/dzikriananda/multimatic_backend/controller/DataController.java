@@ -4,6 +4,7 @@ import com.dzikriananda.multimatic_backend.dto.RegisterDto;
 import com.dzikriananda.multimatic_backend.interfaces.DataService;
 import com.dzikriananda.multimatic_backend.model.ByondReview;
 import com.dzikriananda.multimatic_backend.model.DaySentiment;
+import com.dzikriananda.multimatic_backend.model.ScoreFrequency;
 import com.dzikriananda.multimatic_backend.model.SentimentDistribution;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +37,12 @@ public class DataController {
     @GetMapping("/sentiment-distribution")
     public ResponseEntity<List<SentimentDistribution>> sentimentDistribution() {
         List<SentimentDistribution> data = dataService.findSentimentDistribution();
+        return ResponseEntity.ok(data);
+    }
+
+    @GetMapping("/score-frequency")
+    public ResponseEntity<List<ScoreFrequency>> scoreFrequency() {
+        List<ScoreFrequency> data = dataService.findScoreFrequency();
         return ResponseEntity.ok(data);
     }
 }
