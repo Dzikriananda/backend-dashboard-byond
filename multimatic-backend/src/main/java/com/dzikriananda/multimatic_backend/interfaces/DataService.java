@@ -1,9 +1,6 @@
 package com.dzikriananda.multimatic_backend.interfaces;
 
-import com.dzikriananda.multimatic_backend.model.ByondReview;
-import com.dzikriananda.multimatic_backend.model.DaySentiment;
-import com.dzikriananda.multimatic_backend.model.ScoreFrequency;
-import com.dzikriananda.multimatic_backend.model.SentimentDistribution;
+import com.dzikriananda.multimatic_backend.model.*;
 
 import java.util.List;
 
@@ -14,6 +11,8 @@ public interface DataService {
     List<SentimentDistribution> findSentimentDistribution();
 
     List<ScoreFrequency> findScoreFrequency();
+    List<SentimentCloud> findSentimentCloud();
+    List<ByondReview> findPriorityReview(int offset);
 
 
 

@@ -37,4 +37,22 @@ public interface DataRepository extends JpaRepository<ByondReview, Integer> {
             "ORDER BY score",nativeQuery = true)
     List<Object[]> findScoreFrequency();
 
+    @Query(value = "WITH word_counts AS (\n" +
+            "    SELECT \n" +
+            "        sentiment,\n" +
+            "        lower(word) AS word, \n" +
+            "        COUNT(*) AS frequency\n" +
+            "    FROM (\n" +
+            "        SELECT sentiment, regexp_split_to_table(preprocessed_content, '\\s+') AS word\n" +
+            "        FROM byond_review\n" +
+            "    ) AS words\n" +
+            "    GROUP BY sentiment, word\n" +
+            "    ORDER BY sentiment, frequency DESC\n" +
+            ")\n" +
+            "SELECT * FROM word_counts;\n",nativeQuery = true)
+    List<Object[]> findSentimentCloud();
+
+    @Query(value = "select * from byond_review br order by at limit 10 offset :offset", nativeQuery = true)
+    List<ByondReview> findPriorityReview(@Param("offset") int offset);
+
 }

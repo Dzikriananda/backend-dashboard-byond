@@ -1,10 +1,7 @@
 package com.dzikriananda.multimatic_backend.service;
 
 import com.dzikriananda.multimatic_backend.interfaces.DataService;
-import com.dzikriananda.multimatic_backend.model.ByondReview;
-import com.dzikriananda.multimatic_backend.model.DaySentiment;
-import com.dzikriananda.multimatic_backend.model.ScoreFrequency;
-import com.dzikriananda.multimatic_backend.model.SentimentDistribution;
+import com.dzikriananda.multimatic_backend.model.*;
 import com.dzikriananda.multimatic_backend.repository.DataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,5 +58,22 @@ public class DataServiceImpl implements DataService {
                 ))
                 .collect(Collectors.toList());
 
+    }
+
+    @Override
+    public List<SentimentCloud> findSentimentCloud() {
+        List<Object[]> rawResults = dataRepository.findSentimentCloud();
+        return rawResults.stream()
+                .map(row -> new SentimentCloud(
+                        String.valueOf(row[0]),
+                        (String) row [1],
+                        ((Number) row[2]).intValue()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ByondReview> findPriorityReview(int offset) {
+       return dataRepository.findPriorityReview(offset);
     }
 }
