@@ -1,0 +1,8 @@
+pandas
+flask
+google-play-scraper
+nltk
+Sastrawi
+joblib
+scikit-learn
+psycopg2-binary

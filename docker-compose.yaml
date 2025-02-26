@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: multimatics-backend
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Tniabri12
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount SQL script
+
+  springboot-app:
+    build: ./multimatic-backend
+    container_name: springboot_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/multimatics-backend
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Tniabri12
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+
+  flask-app:
+    build: ./service_scrapandpredict
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    environment:
+      POSTGRES_DB: multimatics-backend
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Tniabri12
+    
+
+volumes:
+  postgres_data:

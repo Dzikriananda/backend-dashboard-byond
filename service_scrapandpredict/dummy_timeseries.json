@@ -1,0 +1,33 @@
+[
+    {
+      "review_date": "2025-02-22T00:00:00Z",
+      "sentiment": 0,
+      "sentiment_count": 26
+    },
+    {
+      "review_date": "2025-02-22T00:00:00Z",
+      "sentiment": 1,
+      "sentiment_count": 102
+    },
+    {
+      "review_date": "2025-02-23T00:00:00Z",
+      "sentiment": 0,
+      "sentiment_count": 38
+    },
+    {
+      "review_date": "2025-02-23T00:00:00Z",
+      "sentiment": 1,
+      "sentiment_count": 24
+    },
+    {
+      "review_date": "2025-02-24T00:00:00Z",
+      "sentiment": 0,
+      "sentiment_count": 7
+    },
+    {
+      "review_date": "2025-02-24T00:00:00Z",
+      "sentiment": 1,
+      "sentiment_count": 3
+    }
+  ]
+  
