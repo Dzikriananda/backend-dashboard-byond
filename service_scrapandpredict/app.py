@@ -43,15 +43,19 @@ predictor = SentimentPredictor('tfidf_vectorizer.pkl', 'logistic_model.pkl')
 @app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
     try:
-        data = request.json
-        print('/FETCH REVIEW IS CALLED')
-        if 'text' in data:  # If single review is provided
+        # data = request.json
+        # if 'text' in data:  # If single review is provided
+        #     text = data['text']
+        #     original_text, preprocessed_text = predictor.preprocess_text(text)
+        #     sentiment = predictor.predict([text])[0]
+
+        #     return jsonify({'text': original_text, 'preprocessed_text': preprocessed_text, 'predicted_sentiment': sentiment})
+        if False:
             text = data['text']
             original_text, preprocessed_text = predictor.preprocess_text(text)
             sentiment = predictor.predict([text])[0]
 
             return jsonify({'text': original_text, 'preprocessed_text': preprocessed_text, 'predicted_sentiment': sentiment})
-
         else:  # Fetch Google Play reviews
             result, _ = reviews(
                 'co.id.bankbsi.superapp',
@@ -131,6 +135,86 @@ def fetch_app_details():
         response = jsonify(app_data)
         response.headers['Connection'] = 'keep-alive'
         return response
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+
+
+@app.route('/fetch_all_reviews', methods=['GET'])
+def fetch_all_reviews():
+    try:
+        # data = request.json
+        # if 'text' in data:  # If single review is provided
+        #     text = data['text']
+        #     original_text, preprocessed_text = predictor.preprocess_text(text)
+        #     sentiment = predictor.predict([text])[0]
+
+        #     return jsonify({'text': original_text, 'preprocessed_text': preprocessed_text, 'predicted_sentiment': sentiment})
+        if False:
+            text = data['text']
+            original_text, preprocessed_text = predictor.preprocess_text(text)
+            sentiment = predictor.predict([text])[0]
+
+            return jsonify({'text': original_text, 'preprocessed_text': preprocessed_text, 'predicted_sentiment': sentiment})
+        else:  # Fetch Google Play reviews
+            result, _ = reviews(
+                'co.id.bankbsi.superapp',
+                lang='id',
+                country='id',
+                count=30000,
+                sort=Sort.NEWEST,
+                filter_score_with=None
+            )
+
+            df = pd.DataFrame(result)
+            df = df[['reviewId', 'userName', 'userImage', 'content', 'score', 'at', 'thumbsUpCount', 'appVersion']]
+            df['content'] = df['content'].fillna('')  # Handle missing values
+            print('1')
+
+
+            # Preprocess content and predict sentiment
+            df['original_content'], df['preprocessed_content'] = zip(*df['content'].apply(predictor.preprocess_text))
+            df['sentiment'] = predictor.predict(df['preprocessed_content'].astype(str))
+            print('2')
+
+            # Convert reviewId to UUID format
+            df['reviewId'] = df['reviewId'].apply(lambda x: str(uuid.UUID(x)))
+
+            # Connect to PostgreSQL database
+            conn = psycopg2.connect(
+                host="localhost",
+                port=5432,
+                database="multimatics-backend",
+                user="postgres",
+                password="Tniabri12"  
+            )
+            print("Connected to the database!")  # <-- Add this after connection
+            cursor = conn.cursor()
+
+            # Check for existing reviews and filter out duplicates
+            existing_review_ids_query = 'SELECT "review_id" FROM byond_review WHERE "review_id" = ANY(%s::uuid[])'
+            cursor.execute(existing_review_ids_query, (df['reviewId'].tolist(),))
+            existing_review_ids = {row[0] for row in cursor.fetchall()}
+            print('3')
+
+            new_reviews = df[~df['reviewId'].isin(existing_review_ids)]
+            print('4')
+
+            if not new_reviews.empty:
+                print('inserting')
+                insert_query = """
+                INSERT INTO byond_review (review_id, user_name, user_image, content, preprocessed_content, score, at, thumbs_up_count, app_version, sentiment)
+                VALUES %s
+                """
+                execute_values(cursor, insert_query, 
+                               [(str(uuid.UUID(row[0])), *row[1:]) for row in new_reviews[['reviewId', 'userName', 'userImage', 'content', 'preprocessed_content', 'score', 'at', 'thumbsUpCount', 'appVersion', 'sentiment']].values.tolist()])
+                conn.commit()
+                print('inserted')
+            print('5')
+            cursor.close()
+            conn.close()
+            return jsonify({'number of reviews inserted': len(new_reviews)})
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

@@ -3,14 +3,13 @@ package com.dzikriananda.multimatic_backend.service;
 import com.dzikriananda.multimatic_backend.interfaces.DataService;
 import com.dzikriananda.multimatic_backend.model.*;
 import com.dzikriananda.multimatic_backend.repository.DataRepository;
+import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @Service
 public class DataServiceImpl implements DataService {
@@ -18,15 +17,17 @@ public class DataServiceImpl implements DataService {
     @Autowired
     DataRepository dataRepository;
 
-
     @Override
     public List<ByondReview> findAllReview() {
         return dataRepository.findAllData();
     }
 
     @Override
-    public List<DaySentiment> findAllSentiment() {
-        List<Object[]> rawResults = dataRepository.findAllSentiment();
+    public List<DaySentiment> findAllSentiment(@Nullable String startDate, @Nullable String endDate) {
+        List<Object[]> rawResults = dataRepository.findAllSentiment(
+                startDate != null ? startDate : null,
+                endDate != null ? endDate : null
+        );
 
         return rawResults.stream()
                 .map(row -> new DaySentiment(
@@ -38,8 +39,8 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<SentimentDistribution> findSentimentDistribution() {
-        List<Object[]> rawResults = dataRepository.findDistributionSentiment();
+    public List<SentimentDistribution> findSentimentDistribution(@Nullable String startDate, @Nullable String endDate) {
+        List<Object[]> rawResults = dataRepository.findDistributionSentiment(startDate, endDate);
         return rawResults.stream()
                 .map(row -> new SentimentDistribution(
                         row[0] != null ? (String) row[0] : "Unknown",
@@ -47,45 +48,43 @@ public class DataServiceImpl implements DataService {
                         (Number) row[2]
                 ))
                 .collect(Collectors.toList());
-
     }
 
     @Override
-    public List<ScoreFrequency> findScoreFrequency() {
-        List<Object[]> rawResults = dataRepository.findScoreFrequency();
+    public List<ScoreFrequency> findScoreFrequency(@Nullable String startDate, @Nullable String endDate) {
+        List<Object[]> rawResults = dataRepository.findScoreFrequency(startDate, endDate);
         return rawResults.stream()
                 .map(row -> new ScoreFrequency(
                         ((Number) row[0]).intValue(),
                         ((Number) row[1]).intValue()
                 ))
                 .collect(Collectors.toList());
-
     }
 
     @Override
-    public List<SentimentCloud> findSentimentCloud() {
-        List<Object[]> rawResults = dataRepository.findSentimentCloud();
+    public List<SentimentCloud> findSentimentCloud(@Nullable String startDate, @Nullable String endDate) {
+        List<Object[]> rawResults = dataRepository.findSentimentCloud(startDate, endDate);
         return rawResults.stream()
                 .map(row -> new SentimentCloud(
                         String.valueOf(row[0]),
-                        (String) row [1],
+                        (String) row[1],
                         ((Number) row[2]).intValue()
                 ))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<ByondReview> findPriorityReview(int offset) {
-       return dataRepository.findPriorityReview(offset);
+    public List<ByondReview> findPriorityReview(int offset, @Nullable String startDate, @Nullable String endDate) {
+        return dataRepository.findPriorityReview(offset, startDate, endDate);
     }
 
     @Override
-    public List<ByondReview> findPriorityReviewBySearch(int offset,String keyword) {
-        return dataRepository.findPriorityReviewBySearch(offset,keyword);
+    public List<ByondReview> findPriorityReviewBySearch(int offset, String keyword, @Nullable String startDate, @Nullable String endDate) {
+        return dataRepository.findPriorityReviewBySearch(offset, keyword, startDate, endDate);
     }
 
     @Override
-    public LatestDate findLatestReviewDate () {
+    public LatestDate findLatestReviewDate() {
         List<Object[]> rawResults = dataRepository.findLatestReviewDate();
         List<LatestDate> date = rawResults.stream().map(
                 index -> new LatestDate((Timestamp) index[0])

@@ -7,15 +7,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/data")
@@ -26,11 +22,16 @@ public class DataController {
 
     @Autowired
     DataService dataService;
+
     @GetMapping("/all-sentiment")
-    public ResponseEntity<List<DaySentiment>> allSentiment() {
-        List<DaySentiment> data = dataService.findAllSentiment();
+    public ResponseEntity<List<DaySentiment>> allSentiment(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        List<DaySentiment> data = dataService.findAllSentiment(startDate, endDate);
         return ResponseEntity.ok(data);
     }
+
     @GetMapping("/all-review")
     public ResponseEntity<List<ByondReview>> allReview() {
         List<ByondReview> data = dataService.findAllReview();
@@ -38,33 +39,50 @@ public class DataController {
     }
 
     @GetMapping("/sentiment-distribution")
-    public ResponseEntity<List<SentimentDistribution>> sentimentDistribution() {
-        List<SentimentDistribution> data = dataService.findSentimentDistribution();
+    public ResponseEntity<List<SentimentDistribution>> sentimentDistribution(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        List<SentimentDistribution> data = dataService.findSentimentDistribution(startDate, endDate);
         return ResponseEntity.ok(data);
     }
 
     @GetMapping("/score-frequency")
-    public ResponseEntity<List<ScoreFrequency>> scoreFrequency() {
-        List<ScoreFrequency> data = dataService.findScoreFrequency();
+    public ResponseEntity<List<ScoreFrequency>> scoreFrequency(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        List<ScoreFrequency> data = dataService.findScoreFrequency(startDate, endDate);
         return ResponseEntity.ok(data);
     }
 
     @GetMapping("/sentiment-cloud")
-    public ResponseEntity<List<SentimentCloud>> sentimentCloud() {
-        List<SentimentCloud> data = dataService.findSentimentCloud();
-
+    public ResponseEntity<List<SentimentCloud>> sentimentCloud(
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        List<SentimentCloud> data = dataService.findSentimentCloud(startDate, endDate);
         return ResponseEntity.ok(data);
     }
 
     @GetMapping("/priority-review")
-    public ResponseEntity<List<ByondReview>> priorityReview(@RequestParam int offset) {
-        List<ByondReview> data = dataService.findPriorityReview(offset);
+    public ResponseEntity<List<ByondReview>> priorityReview(
+            @RequestParam int offset,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        List<ByondReview> data = dataService.findPriorityReview(offset, startDate, endDate);
         return ResponseEntity.ok(data);
     }
 
     @GetMapping("/priority-review/search")
-    public ResponseEntity<List<ByondReview>> priorityReviewBySearch(@RequestParam int offset,@RequestParam String keyword) {
-        List<ByondReview> data = dataService.findPriorityReviewBySearch(offset,keyword);
+    public ResponseEntity<List<ByondReview>> priorityReviewBySearch(
+            @RequestParam int offset,
+            @RequestParam String keyword,
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate
+    ) {
+        List<ByondReview> data = dataService.findPriorityReviewBySearch(offset, keyword, startDate, endDate);
         return ResponseEntity.ok(data);
     }
 
@@ -72,7 +90,6 @@ public class DataController {
     public ResponseEntity<AppDetail> appDetail() throws JsonProcessingException {
         String url = "http://flask-app:5000/fetch_app_details";
 
-        // Set request headers
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.set("Accept", "application/json");
         requestHeaders.set("Connection", "keep-alive");
@@ -80,21 +97,16 @@ public class DataController {
 
         ResponseEntity<AppDetail> response = restTemplate.exchange(url, HttpMethod.GET, entity, AppDetail.class);
 
-        // Ensure response body is not null
-        response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        String responseBody = objectMapper.writeValueAsString(response.getBody()); // Convert to JSON string
+        String responseBody = objectMapper.writeValueAsString(response.getBody());
 
-        // Set response headers
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentLength(responseBody.getBytes(StandardCharsets.UTF_8).length);
         responseHeaders.setContentType(MediaType.APPLICATION_JSON);
-        responseHeaders.set("Connection", "keep-alive"); // 🔥 Force keep-alive in response
+        responseHeaders.set("Connection", "keep-alive");
 
         return new ResponseEntity<>(response.getBody(), responseHeaders, HttpStatus.OK);
-
     }
-
 
     @GetMapping("/latest-review-date")
     public ResponseEntity<LatestDate> latestDate() {

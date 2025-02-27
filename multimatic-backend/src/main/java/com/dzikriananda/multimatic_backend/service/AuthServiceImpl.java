@@ -37,11 +37,6 @@ public class AuthServiceImpl implements AuthService {
         List<User> users = authRepository.findUserByEmail(email);
         return users.isEmpty() ? null : users.get(0);
     }
-//
-//    @Override
-//    public User findUserByUsername(String username) {
-//
-//    }
 
     @Override
     public List<User> findAllUser() {
