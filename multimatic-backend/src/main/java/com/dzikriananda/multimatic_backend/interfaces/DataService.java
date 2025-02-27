@@ -14,6 +14,8 @@ public interface DataService {
     List<SentimentCloud> findSentimentCloud();
     List<ByondReview> findPriorityReview(int offset);
     List<ByondReview> findPriorityReviewBySearch(int offset,String keyword);
+    LatestDate findLatestReviewDate();
+
 
 
 

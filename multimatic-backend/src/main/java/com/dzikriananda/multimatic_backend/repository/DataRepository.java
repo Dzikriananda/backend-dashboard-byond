@@ -57,5 +57,8 @@ public interface DataRepository extends JpaRepository<ByondReview, Integer> {
     @Query(value = "select * from byond_review where content ILIKE '%' || :keyword || '%' order by at limit 10 offset :offset", nativeQuery = true)
     List<ByondReview> findPriorityReviewBySearch(@Param("offset") int offset, @Param("keyword") String keyword);
 
+    @Query(value = "select at from byond_review order by at desc limit 1", nativeQuery = true)
+    List<Object[]> findLatestReviewDate();
+
 
 }

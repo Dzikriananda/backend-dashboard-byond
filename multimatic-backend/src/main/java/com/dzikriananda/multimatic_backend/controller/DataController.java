@@ -29,11 +29,11 @@ public class DataController {
         List<DaySentiment> data = dataService.findAllSentiment();
         return ResponseEntity.ok(data);
     }
-//    @GetMapping("/all-review")
-//    public ResponseEntity<List<ByondReview>> allReview() {
-//        List<ByondReview> data = dataService.findAllReview();
-//        return ResponseEntity.ok(data);
-//    }
+    @GetMapping("/all-review")
+    public ResponseEntity<List<ByondReview>> allReview() {
+        List<ByondReview> data = dataService.findAllReview();
+        return ResponseEntity.ok(data);
+    }
 
     @GetMapping("/sentiment-distribution")
     public ResponseEntity<List<SentimentDistribution>> sentimentDistribution() {
@@ -62,8 +62,6 @@ public class DataController {
 
     @GetMapping("/priority-review/search")
     public ResponseEntity<List<ByondReview>> priorityReviewBySearch(@RequestParam int offset,@RequestParam String keyword) {
-        System.out.println("offset" + offset);
-        System.out.println("keyword" + keyword);
         List<ByondReview> data = dataService.findPriorityReviewBySearch(offset,keyword);
         return ResponseEntity.ok(data);
     }
@@ -72,5 +70,11 @@ public class DataController {
     public ResponseEntity<AppDetail> appDetail() {
         String url = "http://flask-app:5000/fetch_app_details";
         return restTemplate.getForEntity(url, AppDetail.class);
+    }
+
+    @GetMapping("/latest-review-date")
+    public ResponseEntity<LatestDate> latestDate() {
+        LatestDate date = dataService.findLatestReviewDate();
+        return ResponseEntity.ok().body(date);
     }
 }

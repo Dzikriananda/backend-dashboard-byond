@@ -6,6 +6,8 @@ import com.dzikriananda.multimatic_backend.repository.DataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,5 +82,14 @@ public class DataServiceImpl implements DataService {
     @Override
     public List<ByondReview> findPriorityReviewBySearch(int offset,String keyword) {
         return dataRepository.findPriorityReviewBySearch(offset,keyword);
+    }
+
+    @Override
+    public LatestDate findLatestReviewDate () {
+        List<Object[]> rawResults = dataRepository.findLatestReviewDate();
+        List<LatestDate> date = rawResults.stream().map(
+                index -> new LatestDate((Timestamp) index[0])
+        ).collect(Collectors.toList());
+        return date.get(0);
     }
 }
