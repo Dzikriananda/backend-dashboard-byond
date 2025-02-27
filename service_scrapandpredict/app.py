@@ -65,21 +65,24 @@ def fetch_reviews():
             df = pd.DataFrame(result)
             df = df[['reviewId', 'userName', 'userImage', 'content', 'score', 'at', 'thumbsUpCount', 'appVersion']]
             df['content'] = df['content'].fillna('')  # Handle missing values
+            print('1')
+
 
             # Preprocess content and predict sentiment
             df['original_content'], df['preprocessed_content'] = zip(*df['content'].apply(predictor.preprocess_text))
             df['sentiment'] = predictor.predict(df['preprocessed_content'].astype(str))
+            print('2')
 
             # Convert reviewId to UUID format
             df['reviewId'] = df['reviewId'].apply(lambda x: str(uuid.UUID(x)))
 
             # Connect to PostgreSQL database
             conn = psycopg2.connect(
-                host="db",
+                host="localhost",
                 port=5432,
                 database="multimatics-backend",
-                user="userDb_1234_Multimatics",
-                password="Tniabri12!!__0Toqum"  
+                user="postgres",
+                password="Tniabri12"  
             )
             print("Connected to the database!")  # <-- Add this after connection
             cursor = conn.cursor()
@@ -88,8 +91,10 @@ def fetch_reviews():
             existing_review_ids_query = 'SELECT "review_id" FROM byond_review WHERE "review_id" = ANY(%s::uuid[])'
             cursor.execute(existing_review_ids_query, (df['reviewId'].tolist(),))
             existing_review_ids = {row[0] for row in cursor.fetchall()}
+            print('3')
 
             new_reviews = df[~df['reviewId'].isin(existing_review_ids)]
+            print('4')
 
             if not new_reviews.empty:
                 print('inserting')
@@ -101,7 +106,7 @@ def fetch_reviews():
                                [(str(uuid.UUID(row[0])), *row[1:]) for row in new_reviews[['reviewId', 'userName', 'userImage', 'content', 'preprocessed_content', 'score', 'at', 'thumbsUpCount', 'appVersion', 'sentiment']].values.tolist()])
                 conn.commit()
                 print('inserted')
-
+            print('5')
             cursor.close()
             conn.close()
             return jsonify({'number of reviews inserted': len(new_reviews)})
@@ -123,7 +128,9 @@ def fetch_app_details():
             'App Downloads': result['installs'],
             'Number of Reviews': result['reviews'],
         }
-        return jsonify(app_data)
+        response = jsonify(app_data)
+        response.headers['Connection'] = 'keep-alive'
+        return response
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

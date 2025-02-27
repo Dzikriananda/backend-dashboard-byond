@@ -3,13 +3,15 @@ package com.dzikriananda.multimatic_backend.controller;
 import com.dzikriananda.multimatic_backend.dto.RegisterDto;
 import com.dzikriananda.multimatic_backend.interfaces.DataService;
 import com.dzikriananda.multimatic_backend.model.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -67,10 +69,32 @@ public class DataController {
     }
 
     @GetMapping("/app-detail")
-    public ResponseEntity<AppDetail> appDetail() {
+    public ResponseEntity<AppDetail> appDetail() throws JsonProcessingException {
         String url = "http://flask-app:5000/fetch_app_details";
-        return restTemplate.getForEntity(url, AppDetail.class);
+
+        // Set request headers
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.set("Accept", "application/json");
+        requestHeaders.set("Connection", "keep-alive");
+        HttpEntity<String> entity = new HttpEntity<>(requestHeaders);
+
+        ResponseEntity<AppDetail> response = restTemplate.exchange(url, HttpMethod.GET, entity, AppDetail.class);
+
+        // Ensure response body is not null
+        response.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String responseBody = objectMapper.writeValueAsString(response.getBody()); // Convert to JSON string
+
+        // Set response headers
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentLength(responseBody.getBytes(StandardCharsets.UTF_8).length);
+        responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+        responseHeaders.set("Connection", "keep-alive"); // 🔥 Force keep-alive in response
+
+        return new ResponseEntity<>(response.getBody(), responseHeaders, HttpStatus.OK);
+
     }
+
 
     @GetMapping("/latest-review-date")
     public ResponseEntity<LatestDate> latestDate() {
