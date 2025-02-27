@@ -74,13 +74,21 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<ByondReview> findPriorityReview(int offset, @Nullable String startDate, @Nullable String endDate) {
-        return dataRepository.findPriorityReview(offset, startDate, endDate);
+    public PaginatedResponse<ByondReview> findPriorityReview(int offset, @Nullable String startDate, @Nullable String endDate) {
+        List<ByondReview> data = dataRepository.findPriorityReview(offset, startDate, endDate);
+        List<Object[]> rawResults = dataRepository.findTotalRow(startDate,endDate);
+        Long pageSize = (Long) rawResults.get(0)[0];
+        PaginatedResponse<ByondReview> response = new PaginatedResponse<ByondReview>(data,pageSize,offset);
+        return response;
     }
 
     @Override
-    public List<ByondReview> findPriorityReviewBySearch(int offset, String keyword, @Nullable String startDate, @Nullable String endDate) {
-        return dataRepository.findPriorityReviewBySearch(offset, keyword, startDate, endDate);
+    public PaginatedResponse<ByondReview> findPriorityReviewBySearch(int offset, String keyword, @Nullable String startDate, @Nullable String endDate) {
+        List<ByondReview> data = dataRepository.findPriorityReviewBySearch(offset, keyword, startDate, endDate);
+        List<Object[]> rawResults = dataRepository.findTotalRowBySearch(keyword, startDate, endDate);
+        Long pageSize = (Long) rawResults.get(0)[0];
+        PaginatedResponse<ByondReview> response = new PaginatedResponse<ByondReview>(data,pageSize,offset);
+        return response;
     }
 
     @Override

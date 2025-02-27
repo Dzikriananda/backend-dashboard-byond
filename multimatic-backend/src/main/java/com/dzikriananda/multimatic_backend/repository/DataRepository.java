@@ -96,4 +96,25 @@ public interface DataRepository extends JpaRepository<ByondReview, Integer> {
 
     @Query(value = "SELECT at FROM byond_review ORDER BY at DESC LIMIT 1", nativeQuery = true)
     List<Object[]> findLatestReviewDate();
+
+    @Query(value = """
+            SELECT count(*) FROM byond_review 
+            WHERE(:startDate IS NULL OR DATE(at) >= CAST(:startDate AS DATE)) 
+            AND (:endDate IS NULL OR DATE(at) <= CAST(:endDate AS DATE))
+            """, nativeQuery = true)
+    List<Object[]> findTotalRow(
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate
+    );
+
+    @Query(value = """
+            SELECT count(*) FROM byond_review 
+            WHERE content ILIKE '%' || :keyword || '%'
+            AND (:startDate IS NULL OR DATE(at) >= CAST(:startDate AS DATE)) 
+            AND (:endDate IS NULL OR DATE(at) <= CAST(:endDate AS DATE))
+            """, nativeQuery = true)
+    List<Object[]> findTotalRowBySearch(
+            @Param("keyword") String keyword,
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate);
 }

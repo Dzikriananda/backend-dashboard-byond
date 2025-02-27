@@ -17,9 +17,9 @@ public interface DataService {
 
     List<SentimentCloud> findSentimentCloud(@Nullable String startDate, @Nullable String endDate);
 
-    List<ByondReview> findPriorityReview(int offset, @Nullable String startDate, @Nullable String endDate);
+    PaginatedResponse<ByondReview> findPriorityReview(int offset, @Nullable String startDate, @Nullable String endDate);
 
-    List<ByondReview> findPriorityReviewBySearch(int offset, String keyword, @Nullable String startDate, @Nullable String endDate);
+    PaginatedResponse<ByondReview> findPriorityReviewBySearch(int offset, String keyword, @Nullable String startDate, @Nullable String endDate);
 
     LatestDate findLatestReviewDate();
 }

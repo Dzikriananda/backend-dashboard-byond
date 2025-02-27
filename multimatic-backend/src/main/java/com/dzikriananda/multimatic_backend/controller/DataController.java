@@ -66,23 +66,23 @@ public class DataController {
     }
 
     @GetMapping("/priority-review")
-    public ResponseEntity<List<ByondReview>> priorityReview(
+    public ResponseEntity<PaginatedResponse<ByondReview>> priorityReview(
             @RequestParam int offset,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate
     ) {
-        List<ByondReview> data = dataService.findPriorityReview(offset, startDate, endDate);
+        PaginatedResponse<ByondReview> data = dataService.findPriorityReview(offset, startDate, endDate);
         return ResponseEntity.ok(data);
     }
 
     @GetMapping("/priority-review/search")
-    public ResponseEntity<List<ByondReview>> priorityReviewBySearch(
+    public ResponseEntity<PaginatedResponse<ByondReview>> priorityReviewBySearch(
             @RequestParam int offset,
             @RequestParam String keyword,
             @RequestParam(required = false) String startDate,
             @RequestParam(required = false) String endDate
     ) {
-        List<ByondReview> data = dataService.findPriorityReviewBySearch(offset, keyword, startDate, endDate);
+        PaginatedResponse<ByondReview> data = dataService.findPriorityReviewBySearch(offset, keyword, startDate, endDate);
         return ResponseEntity.ok(data);
     }
 
