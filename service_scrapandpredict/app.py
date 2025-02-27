@@ -4,7 +4,7 @@ import string
 import joblib
 import uuid
 from flask import Flask, request, jsonify
-from google_play_scraper import Sort, reviews
+from google_play_scraper import Sort, reviews,app as appp
 from nltk.corpus import stopwords
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 import psycopg2
@@ -35,28 +35,16 @@ class SentimentPredictor:
 # Initialize Sentiment Predictor
 predictor = SentimentPredictor('tfidf_vectorizer.pkl', 'logistic_model.pkl')
 
-@app.route('/test', methods=['GET'])
-def test():
-    print("TEST ENDPOINT CALLED")
-    conn = psycopg2.connect(
-                host="db",
-                port=5432,
-                database="multimatics-backend",
-                user="postgres",
-                password="Tniabri12"  
-    )
-    print("Connected to the database!")  # <-- Add this after connection
-    cursor = conn.cursor()
-    dummyDataQuery = 'SELECT * FROM byond_review'
-    cursor.execute(dummyDataQuery)
-    data = cursor.fetchall()
-    return jsonify({'message': 'test successful','data': data})
 
 
-@app.route('/fetch_reviews', methods=['POST'])
+
+
+
+@app.route('/fetch_reviews', methods=['GET'])
 def fetch_reviews():
     try:
         data = request.json
+        print('/FETCH REVIEW IS CALLED')
         if 'text' in data:  # If single review is provided
             text = data['text']
             original_text, preprocessed_text = predictor.preprocess_text(text)
@@ -90,8 +78,8 @@ def fetch_reviews():
                 host="db",
                 port=5432,
                 database="multimatics-backend",
-                user="postgres",
-                password="Tniabri12"  
+                user="userDb_1234_Multimatics",
+                password="Tniabri12!!__0Toqum"  
             )
             print("Connected to the database!")  # <-- Add this after connection
             cursor = conn.cursor()
@@ -102,7 +90,6 @@ def fetch_reviews():
             existing_review_ids = {row[0] for row in cursor.fetchall()}
 
             new_reviews = df[~df['reviewId'].isin(existing_review_ids)]
-
 
             if not new_reviews.empty:
                 print('inserting')
@@ -121,6 +108,25 @@ def fetch_reviews():
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/fetch_app_details', methods=['GET'])
+def fetch_app_details():
+    try:
+        result = appp(
+            'co.id.bankbsi.superapp',
+            lang='id',  # defaults to 'en'
+            country='id'  # defaults to 'us'
+        )
+        app_data = {
+            'App Score': result['score'],
+            'App Downloads': result['installs'],
+            'Number of Reviews': result['reviews'],
+        }
+        return jsonify(app_data)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)

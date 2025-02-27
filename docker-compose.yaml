@@ -6,8 +6,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: multimatics-backend
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Tniabri12
+      POSTGRES_USER: userDb_1234_Multimatics
+      POSTGRES_PASSWORD: Tniabri12!!__0Toqum
     ports:
       - "5432:5432"
     volumes:
@@ -23,8 +23,8 @@ services:
       - db
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/multimatics-backend
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Tniabri12
+      SPRING_DATASOURCE_USERNAME: userDb_1234_Multimatics
+      SPRING_DATASOURCE_PASSWORD: Tniabri12!!__0Toqum
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
 
   flask-app:
@@ -35,8 +35,8 @@ services:
       - "5000:5000"
     environment:
       POSTGRES_DB: multimatics-backend
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Tniabri12
+      POSTGRES_USER: userDb_1234_Multimatics
+      POSTGRES_PASSWORD: Tniabri12!!__0Toqum
     
 
 volumes:

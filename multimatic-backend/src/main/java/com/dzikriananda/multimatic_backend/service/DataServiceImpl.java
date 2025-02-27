@@ -76,4 +76,9 @@ public class DataServiceImpl implements DataService {
     public List<ByondReview> findPriorityReview(int offset) {
        return dataRepository.findPriorityReview(offset);
     }
+
+    @Override
+    public List<ByondReview> findPriorityReviewBySearch(int offset,String keyword) {
+        return dataRepository.findPriorityReviewBySearch(offset,keyword);
+    }
 }

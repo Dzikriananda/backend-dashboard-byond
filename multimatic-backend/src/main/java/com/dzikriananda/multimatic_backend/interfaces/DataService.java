@@ -13,6 +13,8 @@ public interface DataService {
     List<ScoreFrequency> findScoreFrequency();
     List<SentimentCloud> findSentimentCloud();
     List<ByondReview> findPriorityReview(int offset);
+    List<ByondReview> findPriorityReviewBySearch(int offset,String keyword);
+
 
 
 

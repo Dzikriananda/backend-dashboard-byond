@@ -36,6 +36,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
+        String userIp = request.getHeader("X-Forwarded-For");
+        if (userIp == null || userIp.isEmpty() || "unknown".equalsIgnoreCase(userIp)) {
+            userIp = request.getRemoteAddr();
+        }
+        logger.info("IP" + userIp + "Trying to access endpoint " + request.getRequestURI());
         logger.info(authHeader);
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);

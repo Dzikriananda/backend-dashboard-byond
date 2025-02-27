@@ -8,10 +8,12 @@ import com.dzikriananda.multimatic_backend.model.User;
 import com.dzikriananda.multimatic_backend.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,13 +28,8 @@ public class AuthController {
     @Autowired
     JwtService jwtService;
 
-    @GetMapping("/cors-test")
-    public String cors() {
-        return "cors bypassed";
-    }
-
-
-
+    @Autowired
+    RestTemplate restTemplate;
 
     @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Map<String, String>> register(@RequestBody @Validated RegisterDto userData) {
