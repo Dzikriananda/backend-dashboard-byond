@@ -1,5 +1,8 @@
 version: "3.8"
 
+networks:
+  backend_network:
+    driver: bridge
 services:
   db:
     image: postgres:latest
@@ -8,11 +11,13 @@ services:
       POSTGRES_DB: multimatics-backend
       POSTGRES_USER: userDb_1234_Multimatics
       POSTGRES_PASSWORD: Tniabri12!!__0Toqum
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount SQL script
+    networks:
+        - backend_network
 
   springboot-app:
     build: ./multimatic-backend
@@ -26,17 +31,21 @@ services:
       SPRING_DATASOURCE_USERNAME: userDb_1234_Multimatics
       SPRING_DATASOURCE_PASSWORD: Tniabri12!!__0Toqum
       SPRING_JPA_HIBERNATE_DDL_AUTO: none
+    networks:
+      - backend_network
 
   flask-app:
     build: ./service_scrapandpredict
     depends_on:
       - db
-    ports:
-      - "5000:5000"
+    # ports:
+    #   - "5000:5000"
     environment:
       POSTGRES_DB: multimatics-backend
       POSTGRES_USER: userDb_1234_Multimatics
       POSTGRES_PASSWORD: Tniabri12!!__0Toqum
+    networks:
+      - backend_network
     
 
 volumes:

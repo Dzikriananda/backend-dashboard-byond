@@ -72,7 +72,7 @@ public interface DataRepository extends JpaRepository<ByondReview, Integer> {
             SELECT * FROM byond_review 
             WHERE (:startDate IS NULL OR DATE(at) >= CAST(:startDate AS DATE)) 
             AND (:endDate IS NULL OR DATE(at) <= CAST(:endDate AS DATE))
-            ORDER BY at 
+            ORDER BY thumbs_up_count desc 
             LIMIT 10 OFFSET :offset
             """, nativeQuery = true)
     List<ByondReview> findPriorityReview(
@@ -85,7 +85,7 @@ public interface DataRepository extends JpaRepository<ByondReview, Integer> {
             WHERE content ILIKE '%' || :keyword || '%'
             AND (:startDate IS NULL OR DATE(at) >= CAST(:startDate AS DATE)) 
             AND (:endDate IS NULL OR DATE(at) <= CAST(:endDate AS DATE))
-            ORDER BY at 
+            ORDER BY thumbs_up_count desc 
             LIMIT 10 OFFSET :offset
             """, nativeQuery = true)
     List<ByondReview> findPriorityReviewBySearch(
