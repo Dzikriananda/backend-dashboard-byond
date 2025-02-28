@@ -60,7 +60,7 @@ public interface DataRepository extends JpaRepository<ByondReview, Integer> {
                     AND (:endDate IS NULL OR DATE(at) <= CAST(:endDate AS DATE))
                 ) AS words
                 GROUP BY sentiment, word
-                HAVING COUNT(*) > 70
+                HAVING COUNT(*) > 10
                 ORDER BY sentiment, frequency DESC
             )
             SELECT * FROM word_counts
