@@ -82,11 +82,11 @@ def fetch_reviews():
 
             # Connect to PostgreSQL database
             conn = psycopg2.connect(
-                host="localhost",
+                host="db",  # Use the service name from docker-compose.yml
                 port=5432,
                 database="multimatics-backend",
-                user="postgres",
-                password="Tniabri12"  
+                user="userDb_1234_Multimatics",
+                password="Tniabri12!!__0Toqum"
             )
             print("Connected to the database!")  # <-- Add this after connection
             cursor = conn.cursor()
